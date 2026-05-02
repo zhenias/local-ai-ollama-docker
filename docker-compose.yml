@@ -1,0 +1,27 @@
+services:
+
+  # Open WebUI łączy się z Ollama zainstalowaną natywnie na hoście (nie w Dockerze).
+  # Ollama musi działać lokalnie: brew install ollama && ollama serve
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-ChangeMe123!}
+      - WEBUI_NAME=${WEBUI_NAME:-AILocal}
+      - DEFAULT_LOCALE=pl
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
+      - ENABLE_LOGIN_FORM=${ENABLE_LOGIN_FORM:-true}
+      - DEFAULT_MODELS=${DEFAULT_MODELS:-}
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=${RAG_EMBEDDING_MODEL:-nomic-embed-text}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  open-webui-data:
